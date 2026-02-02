@@ -2,15 +2,12 @@
 pragma solidity ^0.8.20;
 
 contract TimeLockedVault {
-
     address public immutable OWNER;
     uint256 public unlockTime;
-
 
     event Deposit(address indexed sender, uint256 amount);
     event Withdrawal(uint256 amount, uint256 timestamp);
     event LockExtended(uint256 oldUnlockTime, uint256 newUnlockTime);
-
 
     error FundsLocked();
     error OnlyOwner();
@@ -18,12 +15,10 @@ contract TimeLockedVault {
     error CannotReduceLockTime();
     error WithdrawalFailed();
 
-
     modifier onlyOwner() {
         if (msg.sender != OWNER) revert OnlyOwner();
         _;
     }
-
 
     constructor(uint256 _unlockTime) {
         if (_unlockTime <= block.timestamp) revert InvalidUnlockTime();
@@ -31,7 +26,6 @@ contract TimeLockedVault {
         OWNER = msg.sender;
         unlockTime = _unlockTime;
     }
-
 
     function deposit() external payable {
         emit Deposit(msg.sender, msg.value);
@@ -51,19 +45,15 @@ contract TimeLockedVault {
     }
 
     function withdraw() external onlyOwner {
-        // Checks
         if (block.timestamp < unlockTime) revert FundsLocked();
 
         uint256 balance = address(this).balance;
 
-        // Effects (emit event before transfer)
         emit Withdrawal(balance, block.timestamp);
 
-        // Interactions
         (bool success,) = OWNER.call{value: balance}("");
         if (!success) revert WithdrawalFailed();
     }
-
 
     function getBalance() external view returns (uint256) {
         return address(this).balance;

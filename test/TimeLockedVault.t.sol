@@ -13,7 +13,6 @@ contract TimeLockedVaultTest is Test {
     uint256 public constant LOCK_DURATION = 5 minutes;
     uint256 public unlockTime;
 
-    // Events to test
     event Deposit(address indexed sender, uint256 amount);
     event Withdrawal(uint256 amount, uint256 timestamp);
     event LockExtended(uint256 oldUnlockTime, uint256 newUnlockTime);
@@ -24,7 +23,6 @@ contract TimeLockedVaultTest is Test {
         vm.prank(owner);
         vault = new TimeLockedVault(unlockTime);
     }
-
 
     function test_Constructor_SetsOwner() public view {
         assertEq(vault.OWNER(), owner);
@@ -45,7 +43,6 @@ contract TimeLockedVaultTest is Test {
         vm.expectRevert(TimeLockedVault.InvalidUnlockTime.selector);
         new TimeLockedVault(block.timestamp);
     }
-
 
     function test_Deposit_AcceptsETH() public {
         uint256 depositAmount = 1 ether;
@@ -91,7 +88,6 @@ contract TimeLockedVaultTest is Test {
         assertTrue(success);
         assertEq(address(vault).balance, depositAmount);
     }
-
 
     function test_Withdraw_RevertsBeforeUnlockTime() public {
         vm.deal(owner, 1 ether);
@@ -149,7 +145,6 @@ contract TimeLockedVaultTest is Test {
         vm.expectRevert(TimeLockedVault.OnlyOwner.selector);
         vault.withdraw();
     }
-
 
     function test_ExtendLock_ExtendsUnlockTime() public {
         uint256 newUnlockTime = unlockTime + 10 minutes;
@@ -218,7 +213,6 @@ contract TimeLockedVaultTest is Test {
         assertEq(address(vault).balance, 0);
     }
 
-
     function test_GetBalance_ReturnsCorrectBalance() public {
         assertEq(vault.getBalance(), 0);
 
@@ -247,7 +241,6 @@ contract TimeLockedVaultTest is Test {
         assertEq(vault.getTimeUntilUnlock(), 0);
     }
 
-
     function testFuzz_Deposit_AcceptsAnyAmount(uint96 amount) public {
         vm.assume(amount > 0);
 
@@ -268,7 +261,6 @@ contract TimeLockedVaultTest is Test {
 
         assertEq(vault.unlockTime(), newUnlockTime);
     }
-
 
     function test_FullCycle_DepositExtendWithdraw() public {
         // Deposit
